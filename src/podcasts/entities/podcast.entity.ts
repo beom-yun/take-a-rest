@@ -1,6 +1,6 @@
 import { Episode } from './episode.entity';
 
-class Podcast {
+export class Podcast {
   id: number;
   title: string;
   category: string;

@@ -1,5 +1,5 @@
 export class Episode {
-  title: string;
-  summary: string;
-  date: string;
+  episodeId: number;
+  episodeTitle: string;
+  episodeSummary: string;
 }
