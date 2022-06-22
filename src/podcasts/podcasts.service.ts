@@ -72,20 +72,9 @@ export class PodcastsService {
   }
 
   updatePodcast(podcastId: number, updatePodcastDto: UpdatePodcastDto) {
-    this.getOnePodcast(podcastId);
-    this.fakeDB.find((podcast) => {
-      if (podcast.id === podcastId) {
-        podcast.title = updatePodcastDto.title
-          ? updatePodcastDto.title
-          : podcast.title;
-        podcast.category = updatePodcastDto.category
-          ? updatePodcastDto.category
-          : podcast.category;
-        podcast.rating = updatePodcastDto.rating
-          ? updatePodcastDto.rating
-          : podcast.rating;
-      }
-    });
+    const podcast = this.getOnePodcast(podcastId);
+    this.deletePodcast(podcastId);
+    this.fakeDB.push({ ...podcast, ...updatePodcastDto });
   }
 
   deletePodcast(podcastId: number) {
@@ -129,17 +118,9 @@ export class PodcastsService {
     updateEpisodeDto: UpdateEpisodeDto,
   ) {
     const podcast = this.getOnePodcast(podcastId);
-    this.getOneEpisode(podcastId, episodeId);
-    podcast.episodes.find((episode) => {
-      if (episode.id === episodeId) {
-        episode.title = updateEpisodeDto.title
-          ? updateEpisodeDto.title
-          : episode.title;
-        episode.summary = updateEpisodeDto.summary
-          ? updateEpisodeDto.summary
-          : episode.summary;
-      }
-    });
+    const episode = this.getOneEpisode(podcastId, episodeId);
+    this.deleteEpisode(podcastId, episodeId);
+    podcast.episodes.push({ ...episode, ...updateEpisodeDto });
   }
 
   deleteEpisode(podcastId: number, episodeId: number) {
