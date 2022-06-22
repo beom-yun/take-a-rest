@@ -1,9 +1,11 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
+import { CreateEpisodeDto } from './dto/create-episode.dto';
+import { CreatePodcastDto } from './dto/create-podcast.dto';
 import { Podcast } from './entities/podcast.entity';
 
 @Injectable()
 export class PodcastsService {
-  fakeDB: Podcast[] = [
+  private fakeDB: Podcast[] = [
     {
       id: 1,
       title: 'Relaxing Music',
@@ -11,14 +13,14 @@ export class PodcastsService {
       rating: 4.4,
       episodes: [
         {
-          episodeId: 1,
-          episodeTitle: 'Beautiful Piano',
-          episodeSummary: 'Beaultiful Piano Music',
+          id: 1,
+          title: 'Beautiful Piano',
+          summary: 'Beaultiful Piano Music',
         },
         {
-          episodeId: 2,
-          episodeTitle: 'Relax and Study',
-          episodeSummary: 'Relaxing Music for Study and Meditation',
+          id: 2,
+          title: 'Relax and Study',
+          summary: 'Relaxing Music for Study and Meditation',
         },
       ],
     },
@@ -29,34 +31,19 @@ export class PodcastsService {
       rating: 4,
       episodes: [
         {
-          episodeId: 1,
-          episodeTitle: 'What Leadership Looks Like',
-          episodeSummary:
-            'From workplaces to schools to national governments...',
+          id: 1,
+          title: 'What Leadership Looks Like',
+          summary: 'From workplaces to schools to national governments...',
         },
         {
-          episodeId: 2,
-          episodeTitle: 'Listen Again: Sound And Silence',
-          episodeSummary: 'Sound surrounds us, from cacophony even to silence.',
+          id: 2,
+          title: 'Listen Again: Sound And Silence',
+          summary: 'Sound surrounds us, from cacophony even to silence.',
         },
         {
-          episodeId: 3,
-          episodeTitle: 'Humor Us',
-          episodeSummary: 'Humor can lighten the mood.',
-        },
-      ],
-    },
-    {
-      id: 3,
-      title: 'SNL After Party',
-      category: 'TV and Movies',
-      rating: 3.5,
-      episodes: [
-        {
-          episodeId: 1,
-          episodeTitle: 'Lizzo',
-          episodeSummary:
-            'Enjoy these selected highlights from the full-length ...',
+          id: 3,
+          title: 'Humor Us',
+          summary: 'Humor can lighten the mood.',
         },
       ],
     },
@@ -64,5 +51,54 @@ export class PodcastsService {
 
   getAllPodcasts(): Podcast[] {
     return this.fakeDB;
+  }
+
+  createPodcast(podcastDto: CreatePodcastDto) {
+    this.fakeDB.push({
+      id: this.fakeDB.length + 1,
+      ...podcastDto,
+      episodes: [],
+    });
+  }
+
+  getOnePodcast(podcastId: number): Podcast {
+    const podcast = this.fakeDB.find((podcast) => podcast.id === podcastId);
+    if (!podcast) {
+      throw new NotFoundException(`Podcast with ID ${podcastId} not found.`);
+    }
+    return podcast;
+  }
+
+  //
+
+  deleteOnePodcast(podcastId: number) {
+    this.getOnePodcast(podcastId);
+    this.fakeDB = this.fakeDB.filter((podcast) => podcast.id !== podcastId);
+  }
+
+  getEpisodes(podcastId: number) {
+    const podcast = this.getOnePodcast(podcastId);
+    return podcast.episodes;
+  }
+
+  createEpisode(podcastId: number, episode: CreateEpisodeDto) {
+    this.fakeDB.find((podcast) => {
+      if (podcast.id === podcastId) {
+        podcast.episodes.push({
+          id: podcast.episodes.length + 1,
+          ...episode,
+        });
+      }
+    });
+  }
+
+  deleteEpisode(podcastId: number, episodeId: number) {
+    this.fakeDB.find((podcast) => {
+      if (podcast.id === podcastId) {
+        podcast.episodes = podcast.episodes.filter(
+          (episode) => episode.id !== episodeId,
+        );
+      }
+    });
   }
 }
