@@ -1,6 +1,16 @@
-import { Body, Controller, Delete, Get, Param, Post } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Param,
+  Patch,
+  Post,
+} from '@nestjs/common';
 import { CreateEpisodeDto } from './dto/create-episode.dto';
 import { CreatePodcastDto } from './dto/create-podcast.dto';
+import { UpdateEpisodeDto } from './dto/update-episode.dto';
+import { UpdatePodcastDto } from './dto/update-podcast.dto';
 import { Podcast } from './entities/podcast.entity';
 import { PodcastsService } from './podcasts.service';
 
@@ -23,16 +33,22 @@ export class PodcastsController {
     return this.podcastsService.getOnePodcast(+podcastId);
   }
 
-  //@Patch('id')
+  @Patch(':id')
+  updatePodcast(
+    @Param('id') podcastId: number,
+    @Body() updatePodcastDto: UpdatePodcastDto,
+  ) {
+    return this.podcastsService.updatePodcast(+podcastId, updatePodcastDto);
+  }
 
   @Delete(':id')
-  deleteOnePodcast(@Param('id') podcastId: number) {
-    return this.podcastsService.deleteOnePodcast(+podcastId);
+  deletePodcast(@Param('id') podcastId: number) {
+    return this.podcastsService.deletePodcast(+podcastId);
   }
 
   @Get(':id/episodes')
-  getEpisodes(@Param('id') podcastId: number) {
-    return this.podcastsService.getEpisodes(+podcastId);
+  getAllEpisodes(@Param('id') podcastId: number) {
+    return this.podcastsService.getAllEpisodes(+podcastId);
   }
 
   @Post(':id/episodes')
@@ -43,7 +59,18 @@ export class PodcastsController {
     return this.podcastsService.createEpisode(+podcastId, episode);
   }
 
-  //@Patch
+  @Patch(':id/episodes/:episodeId')
+  updateEpisode(
+    @Param('id') podcastId: number,
+    @Param('episodeId') episodeId: number,
+    @Body() updateEpisodeDto: UpdateEpisodeDto,
+  ) {
+    return this.podcastsService.updateEpisode(
+      +podcastId,
+      +episodeId,
+      updateEpisodeDto,
+    );
+  }
 
   @Delete(':id/episodes/:episodeId')
   deleteEpisode(

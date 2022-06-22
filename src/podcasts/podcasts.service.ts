@@ -1,6 +1,8 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { CreateEpisodeDto } from './dto/create-episode.dto';
 import { CreatePodcastDto } from './dto/create-podcast.dto';
+import { UpdateEpisodeDto } from './dto/update-episode.dto';
+import { UpdatePodcastDto } from './dto/update-podcast.dto';
 import { Podcast } from './entities/podcast.entity';
 
 @Injectable()
@@ -69,19 +71,35 @@ export class PodcastsService {
     return podcast;
   }
 
-  //
+  updatePodcast(podcastId: number, updatePodcastDto: UpdatePodcastDto) {
+    this.getOnePodcast(podcastId);
+    this.fakeDB.find((podcast) => {
+      if (podcast.id === podcastId) {
+        podcast.title = updatePodcastDto.title
+          ? updatePodcastDto.title
+          : podcast.title;
+        podcast.category = updatePodcastDto.category
+          ? updatePodcastDto.category
+          : podcast.category;
+        podcast.rating = updatePodcastDto.rating
+          ? updatePodcastDto.rating
+          : podcast.rating;
+      }
+    });
+  }
 
-  deleteOnePodcast(podcastId: number) {
+  deletePodcast(podcastId: number) {
     this.getOnePodcast(podcastId);
     this.fakeDB = this.fakeDB.filter((podcast) => podcast.id !== podcastId);
   }
 
-  getEpisodes(podcastId: number) {
+  getAllEpisodes(podcastId: number) {
     const podcast = this.getOnePodcast(podcastId);
     return podcast.episodes;
   }
 
   createEpisode(podcastId: number, episode: CreateEpisodeDto) {
+    this.getOnePodcast(podcastId);
     this.fakeDB.find((podcast) => {
       if (podcast.id === podcastId) {
         podcast.episodes.push({
@@ -92,13 +110,43 @@ export class PodcastsService {
     });
   }
 
-  deleteEpisode(podcastId: number, episodeId: number) {
-    this.fakeDB.find((podcast) => {
-      if (podcast.id === podcastId) {
-        podcast.episodes = podcast.episodes.filter(
-          (episode) => episode.id !== episodeId,
-        );
+  getOneEpisode(podcastId: number, episodeId: number) {
+    const podcast = this.getOnePodcast(podcastId);
+    const episode = podcast.episodes.find(
+      (episode) => episode.id === episodeId,
+    );
+    if (!episode) {
+      throw new NotFoundException(
+        `Episode with ID ${episodeId} not found in Podcast ID ${podcastId}.`,
+      );
+    }
+    return episode;
+  }
+
+  updateEpisode(
+    podcastId: number,
+    episodeId: number,
+    updateEpisodeDto: UpdateEpisodeDto,
+  ) {
+    const podcast = this.getOnePodcast(podcastId);
+    this.getOneEpisode(podcastId, episodeId);
+    podcast.episodes.find((episode) => {
+      if (episode.id === episodeId) {
+        episode.title = updateEpisodeDto.title
+          ? updateEpisodeDto.title
+          : episode.title;
+        episode.summary = updateEpisodeDto.summary
+          ? updateEpisodeDto.summary
+          : episode.summary;
       }
     });
+  }
+
+  deleteEpisode(podcastId: number, episodeId: number) {
+    const podcast = this.getOnePodcast(podcastId);
+    this.getOneEpisode(podcastId, episodeId);
+    podcast.episodes = podcast.episodes.filter(
+      (episode) => episode.id !== episodeId,
+    );
   }
 }
