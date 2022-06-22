@@ -1,12 +1,19 @@
-import { IsNumber, IsOptional, IsString } from 'class-validator';
+import { Field, InputType, ObjectType, PickType } from '@nestjs/graphql';
+import { Podcast } from '../entities/podcast.entity';
 
-export class CreatePodcastDto {
-  @IsString()
-  title: string;
+@InputType()
+@ObjectType()
+export class CreatePodcastInput extends PickType(Podcast, [
+  'title',
+  'category',
+  'rating',
+]) {}
 
-  @IsString()
-  category: string;
+@ObjectType()
+export class CreatePodcastOutput {
+  @Field((type) => Boolean)
+  ok: boolean;
 
-  @IsNumber()
-  rating: number;
+  @Field((type) => String, { nullable: true })
+  error?: string;
 }
