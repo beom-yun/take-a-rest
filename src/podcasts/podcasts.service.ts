@@ -1,16 +1,23 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { catchError } from 'rxjs';
-import { CreateEpisodeDto } from './dto/create-episode.dto';
+import {
+  CreateEpisodeInput,
+  CreateEpisodeOutput,
+} from './dto/create-episode.dto';
 import {
   CreatePodcastInput,
   CreatePodcastOutput,
 } from './dto/create-podcast.dto';
+import {
+  DeleteEpisodeInput,
+  DeleteEpisodeOutput,
+} from './dto/delete-episode.dto';
 import { DeletePodcastInput } from './dto/delete-podcast.dto';
 import {
   SearchPodcastInput,
   SearchPodcastOutput,
 } from './dto/search-podcast.dto';
-import { UpdateEpisodeDto } from './dto/update-episode.dto';
+import { UpdateEpisodeInput } from './dto/update-episode.dto';
 import {
   UpdatePodcastInput,
   UpdatePodcastOutput,
@@ -122,47 +129,62 @@ export class PodcastsService {
     return podcast.podcast.episodes;
   }
 
-  // createEpisode(podcastId: number, episode: CreateEpisodeDto) {
-  //   this.getOnePodcast(podcastId);
-  //   this.fakeDB.find((podcast) => {
-  //     if (podcast.id === podcastId) {
-  //       podcast.episodes.push({
-  //         id: podcast.episodes.length + 1,
-  //         ...episode,
-  //       });
-  //     }
-  //   });
-  // }
+  createEpisode(createEpisodeInput: CreateEpisodeInput): CreateEpisodeOutput {
+    try {
+      const { podcastId, title, summary } = createEpisodeInput;
+      this.getOnePodcast({ id: podcastId });
+      this.fakeDB.find((podcast) => {
+        if (podcast.id === podcastId) {
+          podcast.episodes.push({
+            id: podcast.episodes.length + 1,
+            ...{ title, summary },
+          });
+        }
+      });
+      return { ok: true };
+    } catch (e) {
+      return { ok: false, error: "Couldn't create an episode" };
+    }
+  }
 
-  // getOneEpisode(podcastId: number, episodeId: number) {
-  //   const podcast = this.getOnePodcast(podcastId);
-  //   const episode = podcast.episodes.find(
-  //     (episode) => episode.id === episodeId,
-  //   );
-  //   if (!episode) {
-  //     throw new NotFoundException(
-  //       `Episode with ID ${episodeId} not found in Podcast ID ${podcastId}.`,
-  //     );
-  //   }
-  //   return episode;
-  // }
+  getOneEpisode(podcastId: number, episodeId: number) {
+    const podcast = this.getOnePodcast({ id: podcastId });
+    const episode = podcast.podcast.episodes.find(
+      (episode) => episode.id === episodeId,
+    );
+    if (!episode) {
+      throw new NotFoundException(
+        `Episode with ID ${episodeId} not found in Podcast ID ${podcastId}.`,
+      );
+    }
+    return episode;
+  }
 
-  // updateEpisode(
-  //   podcastId: number,
-  //   episodeId: number,
-  //   updateEpisodeDto: UpdateEpisodeDto,
-  // ) {
-  //   const podcast = this.getOnePodcast(podcastId);
-  //   const episode = this.getOneEpisode(podcastId, episodeId);
-  //   this.deleteEpisode(podcastId, episodeId);
-  //   podcast.episodes.push({ ...episode, ...updateEpisodeDto });
-  // }
+  updateEpisode(updateEpisodeInput: UpdateEpisodeInput) {
+    try {
+      const { podcastId, id, title, summary } = updateEpisodeInput;
+      const podcast = this.getOnePodcast({ id: podcastId });
+      const episode = this.getOneEpisode(podcastId, id);
+      this.deleteEpisode({ podcastId, id });
+      podcast.podcast.episodes.push({ ...episode, ...updateEpisodeInput });
+      return { ok: true };
+    } catch (e) {
+      return { ok: false, error: "Couldn't update an episode" };
+    }
+  }
 
-  // deleteEpisode(podcastId: number, episodeId: number) {
-  //   const podcast = this.getOnePodcast(podcastId);
-  //   this.getOneEpisode(podcastId, episodeId);
-  //   podcast.episodes = podcast.episodes.filter(
-  //     (episode) => episode.id !== episodeId,
-  //   );
-  // }
+  deleteEpisode(deleteEpisodeInput: DeleteEpisodeInput): DeleteEpisodeOutput {
+    try {
+      const { podcastId, id } = deleteEpisodeInput;
+      const podcast = this.getOnePodcast({ id: podcastId });
+
+      this.getOneEpisode(podcastId, id);
+      podcast.podcast.episodes = podcast.podcast.episodes.filter(
+        (episode) => episode.id !== id,
+      );
+      return { ok: true };
+    } catch (e) {
+      return { ok: false, error: "Couldn't delete an episode" };
+    }
+  }
 }
