@@ -36,8 +36,8 @@ export class PodcastsResolver {
   constructor(private readonly podcastsService: PodcastsService) {}
 
   @Query((returns) => [Podcast])
-  getAllPodcasts(): Podcast[] {
-    return this.podcastsService.getAllPodcasts();
+  async getAllPodcasts(): Promise<Podcast[]> {
+    return await this.podcastsService.getAllPodcasts();
   }
 
   @Mutation((returns) => CreatePodcastOutput)

@@ -1,10 +1,11 @@
 import { Module } from '@nestjs/common';
-// import { PodcastsController } from './podcasts.controller';
+import { TypeOrmModule } from '@nestjs/typeorm';
+import { Podcast } from './entities/podcast.entity';
 import { PodcastsResolver } from './podcasts.resolver';
 import { PodcastsService } from './podcasts.service';
 
 @Module({
-  // controllers: [PodcastsController],
+  imports: [TypeOrmModule.forFeature([Podcast])],
   providers: [PodcastsResolver, PodcastsService],
 })
 export class PodcastsModule {}

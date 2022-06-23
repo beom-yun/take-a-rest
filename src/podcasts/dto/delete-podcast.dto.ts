@@ -1,12 +1,15 @@
-import { ArgsType, Field, InputType, ObjectType } from '@nestjs/graphql';
+import {
+  ArgsType,
+  Field,
+  InputType,
+  ObjectType,
+  PickType,
+} from '@nestjs/graphql';
 import { Podcast } from '../entities/podcast.entity';
 
 @ArgsType()
 @InputType()
-export class DeletePodcastInput {
-  @Field((type) => Number)
-  id: number;
-}
+export class DeletePodcastInput extends PickType(Podcast, ['id']) {}
 
 @ObjectType()
 export class DeletePodcastOutput {

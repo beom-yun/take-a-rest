@@ -26,13 +26,16 @@
     "@nestjs/graphql": "^10.0.16",
     "@nestjs/mapped-types": "^1.0.1",
     "@nestjs/platform-express": "^8.1.1",
+    "@nestjs/typeorm": "^8.1.4",
     "apollo-server-express": "^3.9.0",
     "class-validator": "^0.13.2",
     "graph-tools": "^0.1.2",
     "graphql": "^16.5.0",
     "reflect-metadata": "^0.1.13",
     "rimraf": "^3.0.2",
-    "rxjs": "^7.4.0"
+    "rxjs": "^7.4.0",
+    "sqlite3": "^5.0.8",
+    "typeorm": "^0.3.6"
   },
   "devDependencies": {
     "@nestjs/cli": "^8.1.3",

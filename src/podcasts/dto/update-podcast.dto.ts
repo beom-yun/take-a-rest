@@ -1,8 +1,5 @@
-import { Field, InputType, ObjectType, PickType } from '@nestjs/graphql';
-import { PartialType } from '@nestjs/mapped-types';
+import { Field, InputType, ObjectType } from '@nestjs/graphql';
 import { IsNumber, IsString } from 'class-validator';
-import { Podcast } from '../entities/podcast.entity';
-import { CreatePodcastInput } from './create-podcast.dto';
 
 @InputType()
 export class UpdatePodcastInput {

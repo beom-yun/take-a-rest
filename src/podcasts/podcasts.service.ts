@@ -1,5 +1,6 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { catchError } from 'rxjs';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
 import {
   CreateEpisodeInput,
   CreateEpisodeOutput,
@@ -27,6 +28,11 @@ import { Podcast } from './entities/podcast.entity';
 
 @Injectable()
 export class PodcastsService {
+  constructor(
+    @InjectRepository(Podcast)
+    private readonly podcastRepository: Repository<Podcast>,
+  ) {}
+
   private fakeDB: Podcast[] = [
     {
       id: 1,
@@ -71,8 +77,9 @@ export class PodcastsService {
     },
   ];
 
-  getAllPodcasts(): Podcast[] {
-    return this.fakeDB;
+  async getAllPodcasts(): Promise<Podcast[]> {
+    return this.podcastRepository.find();
+    // return this.fakeDB;
   }
 
   createPodcast(podcastInput: CreatePodcastInput): CreatePodcastOutput {
